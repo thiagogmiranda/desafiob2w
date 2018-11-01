@@ -10,6 +10,7 @@ public class Planeta {
 	private String nome;
 	private String clima;
 	private String terreno;
+	private int numeroAparicoesEmFilmes;
 
 	public Planeta() {
 	}
@@ -22,9 +23,9 @@ public class Planeta {
 	}
 
 	public String get_id() {
-		if(_id == null)
+		if (_id == null)
 			return null;
-		
+
 		return _id.toHexString();
 	}
 
@@ -55,4 +56,13 @@ public class Planeta {
 	public void setTerreno(String terreno) {
 		this.terreno = terreno;
 	}
+
+	public int getNumeroAparicoesEmFilmes() {
+		return numeroAparicoesEmFilmes;
+	}
+
+	public void setNumeroAparicoesEmFilmes(int numeroAparicoesEmFilmes) {
+		this.numeroAparicoesEmFilmes = numeroAparicoesEmFilmes;
+	}
+
 }
