@@ -142,7 +142,7 @@ public class PlanetsApiApplicationTests {
 
 		invokeAdicionar(planeta).andExpect(status().isCreated());
 
-		mvc.perform(get("/api/planetas/buscar/" + planeta.getNome())).andExpect(status().isOk())
+		mvc.perform(get("/api/planetas/?nome=" + planeta.getNome())).andExpect(status().isOk())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("nome", is(planeta.getNome()))).andExpect(jsonPath("clima", is(planeta.getClima())))
 				.andExpect(jsonPath("terreno", is(planeta.getTerreno())));
@@ -150,7 +150,7 @@ public class PlanetsApiApplicationTests {
 
 	@Test
 	public void deveRetornarStatusCodeNotFoundAoBuscarUmPlanetaPeloNome() throws Exception {
-		mvc.perform(get("/api/planetas/buscar/" + getRandom())).andExpect(status().isNotFound());
+		mvc.perform(get("/api/planetas/?nome=" + getRandom())).andExpect(status().isNotFound());
 	}
 
 	@Test
