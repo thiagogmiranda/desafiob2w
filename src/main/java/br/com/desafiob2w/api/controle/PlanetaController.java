@@ -39,7 +39,7 @@ public class PlanetaController {
 
 				return new ResponseEntity<>(planeta, HttpStatus.CREATED);
 			} else {
-				return new ResponseEntity<>("O planeta deve conter um nome, clima e terreno.", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("O planeta deve ter um nome, clima e terreno.", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();

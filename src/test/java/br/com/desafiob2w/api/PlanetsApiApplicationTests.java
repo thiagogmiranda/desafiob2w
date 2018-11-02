@@ -1,5 +1,6 @@
 package br.com.desafiob2w.api;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +16,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.com.desafiob2w.api.infraestrutura.repositorios.PlanetaRepositorio;
 import br.com.desafiob2w.api.modelo.Planeta;
 
 import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -32,18 +35,99 @@ public class PlanetsApiApplicationTests {
 
 	@Autowired
 	private MockMvc mvc;
+	
+	@Autowired
+	private PlanetaRepositorio planetaRepositorio;
 
 	private ObjectMapper mapper = new ObjectMapper();
 
+	@Before
+	public void apagarBancoDeTeste() {
+		planetaRepositorio.deleteAll();
+	}
+	
 	@Test
 	public void deveAdicionarUmPlanetaERetornarOJson() throws Exception {
-		Planeta planeta = new Planeta(getRandom(), getRandom(), getRandom());
+		Planeta planeta = new Planeta("Tatooine", getRandom(), getRandom());
 
 		invokeAdicionar(planeta).andExpect(status().isCreated())
 				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("_id", is(notNullValue()))).andExpect(jsonPath("nome", is(planeta.getNome())))
 				.andExpect(jsonPath("clima", is(planeta.getClima())))
-				.andExpect(jsonPath("terreno", is(planeta.getTerreno())));
+				.andExpect(jsonPath("terreno", is(planeta.getTerreno())))
+				.andExpect(jsonPath("aparicoesEmFilmes", is(equalTo(5))));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComNomeNulo() throws Exception {
+		Planeta planeta = new Planeta(null, getRandom(), getRandom());
+		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComNomeVazio() throws Exception {
+		Planeta planeta = new Planeta("", getRandom(), getRandom());
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComNomeEspacoEmBranco() throws Exception {
+		Planeta planeta = new Planeta("   ", getRandom(), getRandom());		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComClimaNulo() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), null, getRandom());
+		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComClimaVazio() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), "", getRandom());
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComClimaEspacoEmBranco() throws Exception {
+		Planeta planeta = new Planeta(getRandom(),  "   ", getRandom());		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComTerrenoNulo() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), getRandom(), null);
+		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaTerrenoNomeVazio() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), getRandom(), "");
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
+	}
+	
+	@Test
+	public void naoDeveAdicionarUmPlanetaComTerrenoEspacoEmBranco() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), getRandom(), "   ");		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is("O planeta deve ter um nome, clima e terreno."));
 	}
 
 	@Test
@@ -63,7 +147,7 @@ public class PlanetsApiApplicationTests {
 				.andExpect(jsonPath("nome", is(planeta.getNome()))).andExpect(jsonPath("clima", is(planeta.getClima())))
 				.andExpect(jsonPath("terreno", is(planeta.getTerreno())));
 	}
-	
+
 	@Test
 	public void deveRetornarStatusCodeNotFoundAoBuscarUmPlanetaPeloNome() throws Exception {
 		mvc.perform(get("/api/planetas/buscar/" + getRandom())).andExpect(status().isNotFound());
@@ -79,7 +163,7 @@ public class PlanetsApiApplicationTests {
 				.andExpect(jsonPath("nome", is(planeta.getNome()))).andExpect(jsonPath("clima", is(planeta.getClima())))
 				.andExpect(jsonPath("terreno", is(planeta.getTerreno())));
 	}
-	
+
 	@Test
 	public void deveRetornarStatusCodeNotFoundAoBuscarUmPlanetaPeloId() throws Exception {
 		mvc.perform(get("/api/planetas/" + ObjectId.get())).andExpect(status().isNotFound());
@@ -93,7 +177,7 @@ public class PlanetsApiApplicationTests {
 		mvc.perform(get(String.format("/api/planetas/%s/remover", salvo.get_id()))).andExpect(status().isOk());
 		mvc.perform(get("/api/planetas/" + salvo.get_id())).andExpect(status().isNotFound());
 	}
-	
+
 	@Test
 	public void deveRetornarStatusCodeNotFoundAoTentarRemoverUmPlanetaInexistente() throws Exception {
 		mvc.perform(get(String.format("/api/planetas/%s/remover", getRandom()))).andExpect(status().isNotFound());
