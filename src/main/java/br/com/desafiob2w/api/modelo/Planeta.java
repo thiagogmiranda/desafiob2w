@@ -1,5 +1,6 @@
 package br.com.desafiob2w.api.modelo;
 
+import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 
@@ -10,7 +11,9 @@ public class Planeta {
 	private String nome;
 	private String clima;
 	private String terreno;
-	private int numeroAparicoesEmFilmes;
+	
+	@BsonIgnore
+	private int aparicoesEmFilmes;
 
 	public Planeta() {
 	}
@@ -57,12 +60,12 @@ public class Planeta {
 		this.terreno = terreno;
 	}
 
-	public int getNumeroAparicoesEmFilmes() {
-		return numeroAparicoesEmFilmes;
+	public int getAparicoesEmFilmes() {
+		return aparicoesEmFilmes;
 	}
 
-	public void setNumeroAparicoesEmFilmes(int numeroAparicoesEmFilmes) {
-		this.numeroAparicoesEmFilmes = numeroAparicoesEmFilmes;
+	public void setAparicoesEmFilmes(int aparicoesEmFilmes) {
+		this.aparicoesEmFilmes = aparicoesEmFilmes;
 	}
 
 }
