@@ -132,13 +132,18 @@ public class PlanetsApiApplicationTests {
 
 	@Test
 	public void deveRetornarTodosPlanetasCadastrados() throws Exception {
+		invokeAdicionar(criarPlanetaAleatorio()).andExpect(status().isCreated()).andReturn();
+		invokeAdicionar(criarPlanetaAleatorio()).andExpect(status().isCreated()).andReturn();
+		invokeAdicionar(criarPlanetaAleatorio()).andExpect(status().isCreated()).andReturn();
+		
 		mvc.perform(get("/api/planetas/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$", hasSize(3)));
 	}
 
 	@Test
 	public void deveBuscarERetornarUmPlanetaPeloNome() throws Exception {
-		Planeta planeta = new Planeta(getRandom(), getRandom(), getRandom());
+		Planeta planeta = criarPlanetaAleatorio();
 
 		invokeAdicionar(planeta).andExpect(status().isCreated());
 
@@ -155,7 +160,7 @@ public class PlanetsApiApplicationTests {
 
 	@Test
 	public void deveBuscarERetornarUmPlanetaPeloId() throws Exception {
-		Planeta planeta = new Planeta(getRandom(), getRandom(), getRandom());
+		Planeta planeta = criarPlanetaAleatorio();
 		Planeta salvo = getJsonResult(invokeAdicionar(planeta).andExpect(status().isCreated()).andReturn());
 
 		mvc.perform(get("/api/planetas/" + salvo.get_id())).andExpect(status().isOk())
@@ -171,11 +176,10 @@ public class PlanetsApiApplicationTests {
 
 	@Test
 	public void deveRemoverUmPlaneta() throws Exception {
-		Planeta planeta = new Planeta(getRandom(), getRandom(), getRandom());
-		Planeta salvo = getJsonResult(invokeAdicionar(planeta).andExpect(status().isCreated()).andReturn());
+		Planeta planeta = getJsonResult(invokeAdicionar(criarPlanetaAleatorio()).andExpect(status().isCreated()).andReturn());
 
-		mvc.perform(get(String.format("/api/planetas/%s/remover", salvo.get_id()))).andExpect(status().isOk());
-		mvc.perform(get("/api/planetas/" + salvo.get_id())).andExpect(status().isNotFound());
+		mvc.perform(get(String.format("/api/planetas/%s/remover", planeta.get_id()))).andExpect(status().isOk());
+		mvc.perform(get("/api/planetas/" + planeta.get_id())).andExpect(status().isNotFound());
 	}
 
 	@Test
@@ -196,6 +200,10 @@ public class PlanetsApiApplicationTests {
 		return mapper.writeValueAsString(obj).getBytes();
 	}
 
+	private Planeta criarPlanetaAleatorio() {
+		return new Planeta(getRandom(), getRandom(), getRandom());
+	}
+	
 	private String getRandom() {
 		return RandomStringUtils.randomAlphabetic(10);
 	}

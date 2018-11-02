@@ -3,6 +3,7 @@ package br.com.desafiob2w.api.modelo;
 import org.bson.codecs.pojo.annotations.BsonIgnore;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 public class Planeta {
 	@Id
@@ -11,8 +12,6 @@ public class Planeta {
 	private String nome;
 	private String clima;
 	private String terreno;
-	
-	@BsonIgnore
 	private int aparicoesEmFilmes;
 
 	public Planeta() {

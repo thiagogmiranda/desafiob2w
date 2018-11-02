@@ -34,9 +34,9 @@ public class PlanetaController {
 		try {
 			if (dadosValidosParaAdicionar(planeta)) {
 				planeta.set_id(ObjectId.get());
+				planeta.setAparicoesEmFilmes(starWarsApiServico.obterNumeroDeAparicoesEmFilmes(planeta.getNome()));
 
 				planeta = planetaRepositorio.insert(planeta);
-				planeta.setAparicoesEmFilmes(starWarsApiServico.obterNumeroDeAparicoesEmFilmes(planeta.getNome()));
 
 				return new ResponseEntity<>(planeta, HttpStatus.CREATED);
 			} else {
@@ -56,7 +56,7 @@ public class PlanetaController {
 		return new ResponseEntity<>(planetas, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/", params = "nome")
+	@RequestMapping(value = { "", "/" }, params = "nome")
 	public @ResponseBody ResponseEntity<Planeta> buscarPorNome(@RequestParam(value = "nome", required = true) String nome) {
 		try {
 			Planeta planeta = planetaRepositorio.findBynome(nome);
@@ -64,8 +64,6 @@ public class PlanetaController {
 			if (planeta == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-
-			planeta.setAparicoesEmFilmes(starWarsApiServico.obterNumeroDeAparicoesEmFilmes(nome));
 
 			return new ResponseEntity<>(planeta, HttpStatus.OK);
 		} catch (Exception ex) {
@@ -83,8 +81,6 @@ public class PlanetaController {
 			if (planeta == null) {
 				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 			}
-
-			planeta.setAparicoesEmFilmes(starWarsApiServico.obterNumeroDeAparicoesEmFilmes(planeta.getNome()));
 
 			return new ResponseEntity<>(planeta, HttpStatus.OK);
 		} catch (Exception ex) {
