@@ -115,7 +115,7 @@ public class PlanetsApiApplicationTests {
 	}
 	
 	@Test
-	public void naoDeveAdicionarUmPlanetaTerrenoNomeVazio() throws Exception {
+	public void naoDeveAdicionarUmPlanetaComTerrenoVazio() throws Exception {
 		Planeta planeta = new Planeta(getRandom(), getRandom(), "");
 		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
 		
