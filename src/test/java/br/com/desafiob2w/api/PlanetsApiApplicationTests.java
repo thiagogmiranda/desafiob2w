@@ -59,6 +59,20 @@ public class PlanetsApiApplicationTests {
 	}
 	
 	@Test
+	public void naoDeveAdicionarUmPlanetaJaCadastrado() throws Exception {
+		Planeta planeta = new Planeta(getRandom(), getRandom(), getRandom());
+		
+		invokeAdicionar(planeta).andExpect(status().isCreated());
+		
+		planeta.setClima(getRandom());
+		planeta.setTerreno(getRandom());
+		
+		String response = invokeAdicionar(planeta).andExpect(status().isBadRequest()).andReturn().getResponse().getContentAsString();
+		
+		assertThat(response, is(String.format("Já existe um planeta cadastrado com o nome '%s'.", planeta.getNome())));
+	}
+	
+	@Test
 	public void naoDeveAdicionarUmPlanetaComNomeNulo() throws Exception {
 		Planeta planeta = new Planeta(null, getRandom(), getRandom());
 		

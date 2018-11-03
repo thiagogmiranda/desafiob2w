@@ -32,6 +32,13 @@ public class PlanetaController {
 	public @ResponseBody ResponseEntity<Object> adicionar(@RequestBody Planeta planeta) {
 		try {
 			if (dadosValidosParaAdicionar(planeta)) {
+
+				if (jaEstaCadastrado(planeta.getNome())) {
+					return new ResponseEntity<>(
+							String.format("Já existe um planeta cadastrado com o nome '%s'.", planeta.getNome()),
+							HttpStatus.BAD_REQUEST);
+				}
+
 				planeta.set_id(ObjectId.get());
 				planeta.setAparicoesEmFilmes(starWarsApiServico.obterNumeroDeAparicoesEmFilmes(planeta.getNome()));
 
@@ -113,6 +120,10 @@ public class PlanetaController {
 
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	private boolean jaEstaCadastrado(String nome) {
+		return planetaRepositorio.findBynome(nome) != null;
 	}
 
 	private boolean dadosValidosParaAdicionar(Planeta planeta) {
