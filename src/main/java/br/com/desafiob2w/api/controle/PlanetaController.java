@@ -30,7 +30,6 @@ public class PlanetaController {
 
 	@RequestMapping(value = "/adicionar", method = RequestMethod.POST)
 	public @ResponseBody ResponseEntity<Object> adicionar(@RequestBody Planeta planeta) {
-
 		try {
 			if (dadosValidosParaAdicionar(planeta)) {
 				planeta.set_id(ObjectId.get());
@@ -51,13 +50,20 @@ public class PlanetaController {
 
 	@RequestMapping(value = { "", "/" }, params = "!nome")
 	public @ResponseBody ResponseEntity<List<Planeta>> listarTodos() {
-		List<Planeta> planetas = planetaRepositorio.findAll();
+		try {
+			List<Planeta> planetas = planetaRepositorio.findAll();
 
-		return new ResponseEntity<>(planetas, HttpStatus.OK);
+			return new ResponseEntity<>(planetas, HttpStatus.OK);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@RequestMapping(value = { "", "/" }, params = "nome")
-	public @ResponseBody ResponseEntity<Planeta> buscarPorNome(@RequestParam(value = "nome", required = true) String nome) {
+	public @ResponseBody ResponseEntity<Planeta> buscarPorNome(
+			@RequestParam(value = "nome", required = true) String nome) {
 		try {
 			Planeta planeta = planetaRepositorio.findBynome(nome);
 
@@ -92,28 +98,30 @@ public class PlanetaController {
 
 	@RequestMapping(value = "/{id}/remover")
 	public @ResponseBody ResponseEntity<String> remover(@PathVariable String id) {
-		Planeta planeta = planetaRepositorio.findBy_id(toObjectId(id));
+		try {
+			Planeta planeta = planetaRepositorio.findBy_id(toObjectId(id));
 
-		if (planeta == null) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			if (planeta == null) {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+
+			planetaRepositorio.delete(planeta);
+
+			return new ResponseEntity<>("Planeta deletado", HttpStatus.OK);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		planetaRepositorio.delete(planeta);
-
-		return new ResponseEntity<>("Planeta deletado", HttpStatus.OK);
 	}
-	
+
 	private boolean dadosValidosParaAdicionar(Planeta planeta) {
-		if(planeta == null)
-			return false;
-		if(planeta.getNome() == null || planeta.getNome().trim().isEmpty())
-			return false;
-		if(planeta.getClima() == null || planeta.getClima().trim().isEmpty())
-			return false;
-		if(planeta.getTerreno() == null || planeta.getTerreno().trim().isEmpty())
-			return false;
-	
-		return true;
+		return planeta != null && !isNullOrWhiteSpace(planeta.getNome()) && !isNullOrWhiteSpace(planeta.getClima())
+				&& !isNullOrWhiteSpace(planeta.getTerreno());
+	}
+
+	private boolean isNullOrWhiteSpace(String texto) {
+		return texto == null || texto.trim().isEmpty();
 	}
 
 	private ObjectId toObjectId(String id) {
